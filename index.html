@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Laporan Aktivitas Media Sosial</title>
+  <!-- Base path -->
+<base href="/online-report/">
+<!-- Font & Style -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/style.css">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header>
+  <h1>📊 DSB</h1>
+
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <nav>
+  
+    <a href="index.html" class="active">Home</a>
+    <a href="laporan_harian.html">Laporan Harian</a>
+    <a href="laporan_analitik.html">Laporan Analitik</a>
+	<a href="lampiran_screenshoot.html"  >Lampiran (Screen Shoot)</a>
+	<button class="toggle-btn" onclick="logout()">Logout</button>
+	<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </nav>
+
+</header>
+
+<!-- ===== Main ===== -->
+<main>
+  <div class="card">
+    <h3>📈 Jumlah Postingan per Tanggal per Platform</h3>
+   
+    <canvas id="postingChart" height="280"></canvas>
+  </div>
+
+  <div class="title" style="margin-top:30px;">Selamat Datang di Dashboard</div>
+  <div class="subtitle">Pusat akses laporan aktivitas media sosial</div>
+
+  <div class="card">
+    <p>Dashboard ini menyediakan ringkasan dan akses cepat ke laporan pemantauan aktivitas media sosial.</p>
+    <ul>
+      <li><b>Laporan Harian</b> – aktivitas & performa posting pada periode tertentu.</li>
+      <li><b>Laporan Analitik</b> – grafik sentimen, tren & komposisi reach antar platform.</li>
+    </ul>
+    <p>Silakan pilih menu di atas untuk melihat detail laporan.</p>
+  </div>
+
+  <div class="card">
+    <h3>📅 Laporan Terbaru</h3>
+    <p>Periode terakhir diperbarui: <b>20 Oktober 2025</b></p>
+    <p>
+      <a class="toggle-btn" href="laporan_harian.html">Lap Harian</a>
+      <a class="toggle-btn" href="laporan_analitik.html" style="background:#16a34a;">Lap Analitik</a>
+    </p>
+  </div>
+</main>
+
+<footer>© 2025 Dashboard Aktivitas Media Sosial — Semua hak dilindungi.</footer>
+
+<script>
+
+function toggleMenu() {
+  document.querySelector('header nav').classList.toggle('show');
+}
+
+// ==== Proteksi Login ====
+if (!localStorage.getItem("loggedIn")) {
+  window.location.href = "login.html";
+}
+
+// ==== Logout ====
+function logout() {
+  localStorage.removeItem("loggedIn");
+  window.location.href = "login.html";
+}
+
+// ==== Dark mode ====
+window.addEventListener("load", () => {
+  document.body.classList.add("loaded");
+});
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+}
+window.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark');
+  }
+});
+
+// ==== Fade Transition ====
+document.querySelectorAll('a').forEach(a => {
+  const href = a.getAttribute('href');
+  if (href && !href.startsWith('#')) {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location = href; }, 400);
+    });
+  }
+});
+
+// ==== Grafik Aktivitas ====
+fetch("data-aktivitas.csv", { cache: "no-cache" })
+  .then(res => res.text())
+  .then(csv => {
+    const delimiter = csv.includes("\t") ? "\t" : ",";
+    const rows = csv.trim().split("\n").map(r => r.split(delimiter));
+    if (rows.length === 0) return;
+
+    const headers = rows.shift();
+    const idxTanggal = headers.findIndex(h => /tanggal/i.test(h));
+    const idxPlatform = headers.findIndex(h => /platform/i.test(h));
+
+    const countMap = {}; 
+    const platformSet = new Set();
+    const tanggalSet = new Set();
+
+    rows.forEach(r => {
+      const tanggal = r[idxTanggal]?.trim();
+      const platform = r[idxPlatform]?.trim();
+      if (!tanggal || !platform) return;
+      platformSet.add(platform);
+      tanggalSet.add(tanggal);
+      countMap[tanggal] = countMap[tanggal] || {};
+      countMap[tanggal][platform] = (countMap[tanggal][platform] || 0) + 1;
+    });
+
+    const formatTanggalPendek = tglStr => {
+      const bulanNama = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+      const parts = tglStr.split(/[-/]/);
+      let tgl;
+      if (parts[0].length === 4) tgl = new Date(parts[0], parts[1]-1, parts[2]);
+      else if (parts[2]) tgl = new Date(parts[2], parts[1]-1, parts[0]);
+      else tgl = new Date(tglStr);
+      return isNaN(tgl) ? tglStr : `${tgl.getDate()} ${bulanNama[tgl.getMonth()]}`;
+    };
+
+    const tanggalList = Array.from(tanggalSet).sort();
+    const tanggalLabel = tanggalList.map(formatTanggalPendek);
+    const warna = ["#3b82f6","#16a34a","#facc15","#ef4444","#8b5cf6","#0ea5e9","#f97316"];
+
+    const datasets = Array.from(platformSet).map((platform, i) => ({
+      label: platform,
+      data: tanggalList.map(tgl => countMap[tgl]?.[platform] || 0),
+      backgroundColor: warna[i % warna.length],
+      borderRadius: 6
+    }));
+
+    new Chart(document.getElementById("postingChart"), {
+      type: "bar",
+      data: { labels: tanggalLabel, datasets },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" },
+          tooltip: { callbacks: { title: ctx => tanggalList[ctx[0].dataIndex] } }
+        },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: "Jumlah Postingan" } },
+          x: { title: { display: true, text: "Tanggal" }, stacked: true }
+        }
+      }
+    });
+  })
+  .catch(err => console.error("Gagal memuat CSV:", err));
+</script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Analitik Aktivitas Media Sosial</title>
+  <!-- Base path -->
+<base href="/online-report/">
+<link rel="stylesheet" href="assets/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header>
+  <h1>📊 DSB</h1>
+
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <nav>
+  
+    <a href="index.html" class="active">Home</a>
+    <a href="laporan_harian.html">Laporan Harian</a>
+    <a href="laporan_analitik.html">Laporan Analitik</a>
+	<a href="lampiran_screenshoot.html"  >Lampiran (Screen Shoot)</a>
+	<button class="toggle-btn" onclick="logout()">Logout</button>
+	<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </nav>
+
+</header>
+
+<main>
+  <div class="title">Analisis Sentimen dan Opini Publik Periode 26 Sep – 9 Okt 2025</div>
+
+  <!-- Ringkasan Analitik -->
+  <div class="card">
+    <b>Ringkasan Utama</b><br>
+    <ul>
+      <li>Sentimen <b>positif meningkat</b> signifikan dari 28% menjadi 45% sepanjang periode pemantauan.</li>
+      <li>Sentimen <b>negatif menurun</b> dari 38% menjadi 28%, menunjukkan penurunan tekanan opini negatif publik.</li>
+      <li>Sentimen <b>netral stabil</b> di kisaran 27–32%, mencerminkan kelompok masyarakat yang menunggu perkembangan kasus.</li>
+      <li>Kesimpulan umum: <b>Persepsi publik mulai beralih ke arah positif</b> terhadap NAM setelah klarifikasi dan konsolidasi narasi publik.</li>
+    </ul>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <b>📈 Komposisi Sentimen (Keseluruhan)</b>
+      <canvas id="sentimentPie" height="230"></canvas>
+    </div>
+    <div class="card">
+      <b>📊 Sentimen per Platform</b>
+      <canvas id="sentimentBar" height="230"></canvas>
+    </div>
+  </div>
+
+  <!-- Perbandingan Sebelum & Sesudah Klarifikasi -->
+  <div class="card">
+    <b>🕒 Perbandingan Sentimen Sebelum & Sesudah Klarifikasi</b>
+    <div class="grid">
+      <div>
+        <p><b>Sebelum Klarifikasi (26 Sep – 2 Okt)</b></p>
+        <canvas id="beforeChart" height="220"></canvas>
+      </div>
+      <div>
+        <p><b>Sesudah Klarifikasi (3 – 9 Okt)</b></p>
+        <canvas id="afterChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tren Harian -->
+  <div class="card">
+    <b>📅 Tren Harian Sentimen Publik (26 Sep – 9 Okt 2025)</b>
+    <canvas id="trendChart" height="250"></canvas>
+  </div>
+
+  <div class="card">
+    <b>🧭 Analisis Opini & Sentimen</b>
+    <p>
+      Sentimen positif didorong oleh narasi keberhasilan NAM dalam menjelaskan posisi dan transparansi proses hukum. 
+      Dukungan muncul dari opini media arus utama yang menyoroti aspek profesionalitas dan kontribusi sosialnya. 
+      Sementara opini negatif banyak datang dari akun sosial politik yang menyoroti sisi personal dan dugaan moral hazard.
+    </p>
+    <p>
+      Tren menunjukkan <b>arus opini negatif mulai melemah</b> pasca klarifikasi resmi pada awal Oktober. 
+      Persepsi positif meningkat terutama di platform <b>Instagram dan media berita daring</b> yang menekankan nilai kemanusiaan dan kredibilitas.
+    </p>
+    <p>
+      Secara umum, publik mulai menilai kasus ini <b>lebih bersifat politis daripada personal</b>, menandakan keberhasilan NAM dalam mengelola narasi publik 
+      dan memulihkan persepsi positif.
+    </p>
+  </div>
+</main>
+
+<footer>© 2025 Dashboard Analitik NAM — Semua hak dilindungi.</footer>
+
+<script>
+// === Data dari NAM3.pdf ===
+const sentimentData = {Positif:39, Netral:30, Negatif:31};
+
+// === Komposisi Sentimen (Pie) ===
+const ctxPie = document.getElementById("sentimentPie").getContext("2d");
+new Chart(ctxPie,{
+  type:"pie",
+  data:{
+    labels:["Positif","Netral","Negatif"],
+    datasets:[{
+      data:[sentimentData.Positif,sentimentData.Netral,sentimentData.Negatif],
+      backgroundColor:["#16a34a","#facc15","#ef4444"]
+    }]
+  },
+  options:{plugins:{legend:{position:"bottom"}}}
+});
+
+// === Sentimen per Platform ===
+const ctxBar = document.getElementById("sentimentBar").getContext("2d");
+new Chart(ctxBar,{
+  type:"bar",
+  data:{
+    labels:["Twitter/X","TikTok","Media Online","Instagram"],
+    datasets:[
+      {label:"Positif", data:[42,38,47,50], backgroundColor:"#16a34a"},
+      {label:"Netral", data:[30,33,28,27], backgroundColor:"#facc15"},
+      {label:"Negatif", data:[28,29,25,23], backgroundColor:"#ef4444"}
+    ]
+  },
+  options:{
+    plugins:{legend:{position:"bottom"}},
+    scales:{y:{beginAtZero:true}}
+  }
+});
+
+// === Sebelum Klarifikasi ===
+const ctxBefore = document.getElementById("beforeChart").getContext("2d");
+new Chart(ctxBefore,{
+  type:"pie",
+  data:{
+    labels:["Positif","Netral","Negatif"],
+    datasets:[{
+      data:[28,34,38],
+      backgroundColor:["#16a34a","#facc15","#ef4444"]
+    }]
+  },
+  options:{plugins:{legend:{position:"bottom"}}}
+});
+
+// === Sesudah Klarifikasi ===
+const ctxAfter = document.getElementById("afterChart").getContext("2d");
+new Chart(ctxAfter,{
+  type:"pie",
+  data:{
+    labels:["Positif","Netral","Negatif"],
+    datasets:[{
+      data:[45,27,28],
+      backgroundColor:["#16a34a","#facc15","#ef4444"]
+    }]
+  },
+  options:{plugins:{legend:{position:"bottom"}}}
+});
+
+// === Tren Harian Sentimen (berdasarkan data laporan) ===
+const ctxTrend = document.getElementById("trendChart").getContext("2d");
+new Chart(ctxTrend,{
+  type:"line",
+  data:{
+    labels:["26 Sep","27 Sep","28 Sep","29 Sep","30 Sep","1 Okt","2 Okt","3 Okt","4 Okt","5 Okt","6 Okt","7 Okt","8 Okt","9 Okt"],
+    datasets:[
+      {
+        label:"Positif",
+        data:[25,26,28,29,31,32,33,38,40,42,44,45,46,47],
+        borderColor:"#16a34a",
+        backgroundColor:"#86efac55",
+        fill:true,
+        tension:0.3
+      },
+      {
+        label:"Netral",
+        data:[33,32,31,31,30,30,30,29,28,28,28,28,29,29],
+        borderColor:"#facc15",
+        backgroundColor:"#fde04755",
+        fill:true,
+        tension:0.3
+      },
+      {
+        label:"Negatif",
+        data:[42,42,41,40,39,38,37,33,32,30,28,27,26,26],
+        borderColor:"#ef4444",
+        backgroundColor:"#fca5a555",
+        fill:true,
+        tension:0.3
+      }
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{position:"bottom"}},
+    scales:{
+      y:{beginAtZero:true,title:{display:true,text:"Persentase (%)"}},
+      x:{title:{display:true,text:"Tanggal"}}
+    }
+  }
+});
+</script>
+
+</body>
+</html>

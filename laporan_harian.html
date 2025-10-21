@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laporan Aktivitas Media Sosial</title>
+  <!-- Base path -->
+<base href="/online-report/">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>📊 DSB</h1>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="laporan_harian.html" class="active">Laporan Harian</a>
+    <a href="laporan_analitik.html">Laporan Analitik</a>
+    <a href="lampiran_screenshoot.html">Lampiran (Screen Shoot)</a>
+    <button class="toggle-btn" onclick="logout()">Logout</button>
+    <button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </nav>
+</header>
+
+<main>
+  <div class="title">Laporan Aktivitas Media Sosial</div>
+  <div class="subtitle">Pilih rentang tanggal untuk melihat aktivitas tertentu</div>
+
+  <div class="filter-box">
+    <label>Dari:</label> <input type="date" id="startDate">
+    <label>Sampai:</label> <input type="date" id="endDate">
+  </div>
+
+  <div id="summary" class="card loading">Memuat data...</div>
+
+  <div class="grid">
+    <div class="card">
+      <b>Aktivitas per Platform</b>
+      <canvas id="platformChart" height="200"></canvas>
+    </div>
+    <div class="card">
+      <b>Distribusi Jenis Konten</b>
+      <canvas id="contentChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>Lampiran Aktivitas</b>
+    <div class="table-container">
+      <table id="lampiranTable">
+        <thead>
+          <tr><th>No</th><th>Tanggal</th><th>Platform</th><th>Jenis Konten</th><th>Link</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+    <button id="exportBtn" class="toggle-btn">💾 Unduh CSV Lampiran</button>
+  </div>
+</main>
+
+<footer>© 2025 Media Sosial Analytics Portal</footer>
+
+<script>
+function toggleMenu() {
+  document.querySelector('header nav').classList.toggle('show');
+}
+
+let allData = [];
+let currentPage = 1;
+const rowsPerPage = 10;
+let platformChart, contentChart;
+
+async function loadCSV() {
+  const res = await fetch("data-aktivitas.csv");
+  const csv = await res.text();
+  const delimiter = csv.includes("\t") ? "\t" : ",";
+  const rows = csv.trim().split("\n").map(r => r.split(delimiter));
+  const headers = rows.shift();
+
+  allData = rows.map(r => ({
+    tanggal: r[headers.findIndex(h=>/tanggal/i.test(h))],
+    platform: r[headers.findIndex(h=>/platform/i.test(h))],
+    jenis: r[headers.findIndex(h=>/jenis/i.test(h))],
+    link: r[headers.findIndex(h=>/link/i.test(h))]
+  }));
+
+  const tanggalList = allData.map(d => d.tanggal).sort();
+  document.getElementById("startDate").min = tanggalList[0];
+  document.getElementById("startDate").max = tanggalList[tanggalList.length-1];
+  document.getElementById("endDate").min = tanggalList[0];
+  document.getElementById("endDate").max = tanggalList[tanggalList.length-1];
+  document.getElementById("startDate").value = tanggalList[0];
+  document.getElementById("endDate").value = tanggalList[tanggalList.length-1];
+
+  applyFilter();
+}
+
+document.getElementById("startDate").addEventListener("change", applyFilter);
+document.getElementById("endDate").addEventListener("change", applyFilter);
+
+function applyFilter(){
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+  let filtered = allData;
+  if(start && end){
+    filtered = allData.filter(d => d.tanggal >= start && d.tanggal <= end);
+  }
+  updateSummary(filtered);
+  updateCharts(filtered);
+  updateTable(filtered);
+}
+
+function updateSummary(data){
+  const total = data.length;
+  const platformAktif = [...new Set(data.map(d=>d.platform))].join(", ") || "-";
+  const jenisTerbanyak = Object.entries(data.reduce((acc, d)=>{
+    acc[d.jenis]=(acc[d.jenis]||0)+1; return acc;
+  },{})).sort((a,b)=>b[1]-a[1])[0]?.[0] || "-";
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+
+  document.getElementById("summary").innerHTML = `
+    <b>Ringkasan Aktivitas</b><br>
+    Periode: <b>${start || "-"} – ${end || "-"}</b><br>
+    Total posting: <b>${total}</b><br>
+    Platform aktif: ${platformAktif}<br>
+    Jenis konten terbanyak: <b>${jenisTerbanyak}</b>
+  `;
+}
+
+function updateCharts(data){
+  const platformCount = {};
+  const jenisCount = {};
+  data.forEach(d=>{
+    platformCount[d.platform]=(platformCount[d.platform]||0)+1;
+    jenisCount[d.jenis]=(jenisCount[d.jenis]||0)+1;
+  });
+
+  const pc = document.getElementById("platformChart").getContext("2d");
+  const cc = document.getElementById("contentChart").getContext("2d");
+  if(platformChart) platformChart.destroy();
+  if(contentChart) contentChart.destroy();
+
+  platformChart = new Chart(pc,{
+    type:"bar",
+    data:{labels:Object.keys(platformCount),datasets:[{data:Object.values(platformCount),backgroundColor:"#3b82f6"}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+
+  contentChart = new Chart(cc,{
+    type:"bar",
+    data:{labels:Object.keys(jenisCount),datasets:[{data:Object.values(jenisCount),backgroundColor:"#16a34a"}]},
+    options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+  });
+}
+
+function updateTable(data){
+  const sorted = [...data].sort((a,b)=> new Date(b.tanggal)-new Date(a.tanggal));
+  const tbody = document.querySelector("#lampiranTable tbody");
+  const pagination = document.getElementById("pagination");
+  const totalPages = Math.ceil(sorted.length / rowsPerPage);
+
+  if(currentPage > totalPages) currentPage = totalPages || 1;
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const paginated = sorted.slice(start, end);
+  const totalItems = sorted.length;
+
+  tbody.innerHTML = "";
+  paginated.forEach((d,i)=>{
+    const nomor = totalItems - (start + i); // nomor terbesar dulu
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td data-label="No">${nomor}</td>
+      <td data-label="Tanggal">${d.tanggal}</td>
+      <td data-label="Platform">${d.platform}</td>
+      <td data-label="Jenis Konten">${d.jenis}</td>
+      <td data-label="Link"><a href="${d.link}" target="_blank">${d.link}</a></td>`;
+    tbody.appendChild(tr);
+  });
+
+  pagination.innerHTML = "";
+  const prev = document.createElement("button");
+  prev.textContent = "‹ ";
+  prev.disabled = currentPage === 1;
+  prev.onclick = ()=>{ currentPage--; updateTable(data); };
+
+  const next = document.createElement("button");
+  next.textContent = " ›";
+  next.disabled = currentPage === totalPages;
+  next.onclick = ()=>{ currentPage++; updateTable(data); };
+
+  const info = document.createElement("span");
+  info.textContent = `Halaman ${currentPage} / ${totalPages || 1}`;
+  pagination.append(prev, info, next);
+}
+
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const blob = new Blob([convertToCSV(allData)],{type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Laporan_Aktivitas_Filter.csv";
+  a.click();
+});
+
+function convertToCSV(data){
+  const header = "Tanggal,Platform,Jenis Konten,Link\n";
+  const rows = data.map(d=>`${d.tanggal},${d.platform},${d.jenis},${d.link}`).join("\n");
+  return header+rows;
+}
+
+loadCSV();
+
+function toggleDarkMode(){ 
+  document.body.classList.toggle('dark'); 
+  localStorage.setItem('darkMode',document.body.classList.contains('dark')); 
+}
+window.addEventListener('DOMContentLoaded', ()=>{ 
+  if(localStorage.getItem('darkMode')==='true'){ document.body.classList.add('dark'); } 
+});
+function logout(){ localStorage.removeItem('loggedIn'); window.location.href='login.html'; }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laporan Analitik Minggu ke-3 — NAM</title>
+  <!-- Base path -->
+<base href="/online-report/">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="assets/style.css">
+
+</head>
+<body>
+
+ <header>
+  <h1>📊 DSB</h1>
+
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <nav>
+  
+    <a href="index.html" class="active">Home</a>
+    <a href="laporan_harian.html">Laporan Harian</a>
+    <a href="laporan_analitik.html">Laporan Analitik</a>
+	<a href="lampiran_screenshoot.html"  >Lampiran (Screen Shoot)</a>
+	<button class="toggle-btn" onclick="logout()">Logout</button>
+	<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </nav>
+
+</header>
+
+<main>  <div class="title">Analisis Sentimen dan Opini Publik Periode 26 Sep – 9 Okt 2025</div>
+  <div class="card">
+    <h2>1️⃣ Ringkasan Singkat</h2>
+    <ul class="summary">
+      <li>Periode analisa dasar: <b>26 Sep – 12 Okt 2025</b> </li>
+      <li>Komposisi sentimen rata‑rata selama periode: <b>Positif 39%</b>, Netral 30%, Negatif 31%.</li>
+      <li>Dua lonjakan besar mention: <b>3 Okt</b> dan <b>9–10 Okt</b>.</li>
+      <li>Proyeksi tren menunjukkan sentimen positif dapat mencapai ≈<b>50%</b> pada 17 Okt 2025. Hal ini ddisebabkan karena pola komunikasi dan share konten bertahan dan cenderung naik, dan banyaknya postingan yang viral (lihat menu lampiran).</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>2️⃣ Narasi Dominan Pembelaan</h2>
+    <p>Beberapa argumen utama yang muncul di sisi pembelaan — dibagi dalam beberapa tema besar:</p>
+    <h3>1. Inovasi & Rekam Jejak Positif</h3>
+    <p>Nadiem dikenal sebagai figur inovatif (startup, digitalisasi pendidikan), dan program Chromebook dilihat sebagai usaha memodernisasi pendidikan.</p>
+    <ul>
+      <li>“Bernait baik”, bukan “berniat korup”; motivasi utama kemajuan pendidikan.</li>
+      <li>Digitalisasi sekolah sebagai warisan yang belum terbukti salah.</li>
+      <li>Dilakukan di masa pandemi, wajar terjadi percepatan dan risiko.</li>
+    </ul>
+
+    <h3>2. Kerugian Negara Belum Terbukti / Audit Tidak Menunjukkan Mark-up</h3>
+    <ul>
+      <li>Audit BPKP menunjukkan harga normal, tepat sasaran, tanpa kerugian negara yang jelas.</li>
+      <li>Argumen hukum: “Jika tidak ada kerugian negara, korupsi tak bisa dibuktikan.”</li>
+      <li>Penetapan tersangka dinilai terlalu cepat dan formalistik.</li>
+    </ul>
+
+    <h3>3. Proses Hukum Belum Adil / Hak Asasi Perlu Dijaga</h3>
+    <ul>
+      <li>Penetapan tersangka dianggap tergesa dan dasar hukumnya lemah.</li>
+      <li>Hakim hanya menilai prosedur, bukan substansi bukti — disebut “kemenangan formal Kejagung”.</li>
+      <li>Asas praduga tak bersalah harus dihormati.</li>
+    </ul>
+
+    <h3>4. Serangan Opini vs Fakta</h3>
+    <ul>
+      <li>Media sosial dianggap lebih mengandalkan persepsi daripada fakta.</li>
+      <li>Tagar dukungan seperti <b>#AnakKamiBersih</b> dan <b>#JusticeForNadiem</b> digunakan untuk menandai solidaritas.</li>
+      <li>Pesan utama: jangan sampai inovasi pendidikan (“Merdeka Belajar”) hancur karena proses hukum belum matang.</li>
+    </ul>
+
+    <h3>📅 Kronologi 10–17 Oktober</h3>
+    <ul>
+      <li><b>10 Oktober:</b> Fokus pada argumen audit dan ketiadaan kerugian negara.</li>
+      <li><b>11 Oktober:</b> Pembela optimis jelang putusan.</li>
+      <li><b>13 Oktober:</b> Praperadilan ditolak; pembela menyoroti proses formalitas.</li>
+      <li><b>14–17 Oktober:</b> Narasi bergeser ke “persidangan pokok perkara” dan menuntut keadilan prosedural.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3️⃣ Analisis Kuantitatif Sentimen di Sosial Media</h2>
+    <div class="grid">
+      <div class="card">
+        <b>📈 Komposisi Sentimen (Keseluruhan)</b>
+        <canvas id="sentimentPie" height="240"></canvas>
+        <p class="muted">Positif 39%, Netral 30%, Negatif 31%.</p>
+      </div>
+
+      <div class="card">
+        <b>📅 Tren Harian Sentimen (26 Sep – 17 Okt 2025)</b>
+        <canvas id="trendChart" height="260"></canvas>
+        <p class="muted">Tren awal berdasarkan data (26 Sep–12 Okt).</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <b>🧾 Data Kuantitatif (Tabel Ringkasan)</b>
+      <div style="overflow:auto;">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="text-align:left;background:#f1f5f9">
+              <th style="padding:8px;border:1px solid #e6eef7">Tanggal</th>
+              <th style="padding:8px;border:1px solid #e6eef7">Positif (%)</th>
+              <th style="padding:8px;border:1px solid #e6eef7">Netral (%)</th>
+              <th style="padding:8px;border:1px solid #e6eef7">Negatif (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+
+        <tr><td style="padding:8px;border:1px solid #eef5fb">26 Sep</td><td style="padding:8px;border:1px solid #eef5fb">25</td><td style="padding:8px;border:1px solid #eef5fb">33</td><td style="padding:8px;border:1px solid #eef5fb">42</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">27 Sep</td><td style="padding:8px;border:1px solid #eef5fb">26</td><td style="padding:8px;border:1px solid #eef5fb">32</td><td style="padding:8px;border:1px solid #eef5fb">42</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">28 Sep</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">31</td><td style="padding:8px;border:1px solid #eef5fb">41</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">29 Sep</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">31</td><td style="padding:8px;border:1px solid #eef5fb">40</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">30 Sep</td><td style="padding:8px;border:1px solid #eef5fb">31</td><td style="padding:8px;border:1px solid #eef5fb">30</td><td style="padding:8px;border:1px solid #eef5fb">39</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">1 Okt</td><td style="padding:8px;border:1px solid #eef5fb">32</td><td style="padding:8px;border:1px solid #eef5fb">30</td><td style="padding:8px;border:1px solid #eef5fb">38</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">2 Okt</td><td style="padding:8px;border:1px solid #eef5fb">33</td><td style="padding:8px;border:1px solid #eef5fb">30</td><td style="padding:8px;border:1px solid #eef5fb">37</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">3 Okt</td><td style="padding:8px;border:1px solid #eef5fb">38</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">33</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">4 Okt</td><td style="padding:8px;border:1px solid #eef5fb">40</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">32</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">5 Okt</td><td style="padding:8px;border:1px solid #eef5fb">42</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">30</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">6 Okt</td><td style="padding:8px;border:1px solid #eef5fb">44</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">28</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">7 Okt</td><td style="padding:8px;border:1px solid #eef5fb">45</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">27</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">8 Okt</td><td style="padding:8px;border:1px solid #eef5fb">46</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">26</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">9 Okt</td><td style="padding:8px;border:1px solid #eef5fb">47</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">26</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">10 Okt</td><td style="padding:8px;border:1px solid #eef5fb">48</td><td style="padding:8px;border:1px solid #eef5fb">28.5</td><td style="padding:8px;border:1px solid #eef5fb">23.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">11 Okt</td><td style="padding:8px;border:1px solid #eef5fb">48.5</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">22.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">12 Okt</td><td style="padding:8px;border:1px solid #eef5fb">47</td><td style="padding:8px;border:1px solid #eef5fb">30</td><td style="padding:8px;border:1px solid #eef5fb">23</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">13 Okt</td><td style="padding:8px;border:1px solid #eef5fb">48</td><td style="padding:8px;border:1px solid #eef5fb">29.5</td><td style="padding:8px;border:1px solid #eef5fb">22.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">14 Okt</td><td style="padding:8px;border:1px solid #eef5fb">48.5</td><td style="padding:8px;border:1px solid #eef5fb">29</td><td style="padding:8px;border:1px solid #eef5fb">22.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">15 Okt</td><td style="padding:8px;border:1px solid #eef5fb">49</td><td style="padding:8px;border:1px solid #eef5fb">28.5</td><td style="padding:8px;border:1px solid #eef5fb">21.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">16 Okt</td><td style="padding:8px;border:1px solid #eef5fb">49.5</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">22.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid #eef5fb">17 Okt</td><td style="padding:8px;border:1px solid #eef5fb">50</td><td style="padding:8px;border:1px solid #eef5fb">28</td><td style="padding:8px;border:1px solid #eef5fb">22</td></tr>
+      
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4️⃣ Kesimpulan</h2>
+    <ul>
+      <li>Sentimen positif meningkat signifikan (28% → 45%) selama periode pemantauan.</li>
+      <li>Narasi pembelaan mulai mendominasi, menggantikan persepsi negatif awal.</li>
+      <li>Efektivitas komunikasi publik dan konten emosional berperan besar dalam peningkatan dukungan.</li>
+      <li>Namun, masih ada kritik terhadap transparansi bukti dan prosedur hukum.</li>
+      <li>Putusan praperadilan yang menolak gugatan Nadiem membuat narasi beralih ke fokus pada pembuktian di sidang pokok perkara.</li>
+    </ul>
+  </div>
+</main>
+
+<footer>© 2025 Dashboard Analitik NAM — Generated report</footer>
+
+<script>
+// === Komposisi Sentimen (Pie) ===
+const pieCtx = document.getElementById("sentimentPie").getContext("2d");
+new Chart(pieCtx,{
+  type:"doughnut",
+  data:{
+    labels:["Positif","Netral","Negatif"],
+    datasets:[{data:[39,30,31], backgroundColor:["#10b981","#facc15","#ef4444"], hoverOffset:6}]
+  },
+  options:{plugins:{legend:{position:"bottom"}}}
+});
+
+// === Tren Harian ===
+const trendCtx = document.getElementById("trendChart").getContext("2d");
+new Chart(trendCtx,{
+  type:"line",
+  data:{
+    labels:['26 Sep', '27 Sep', '28 Sep', '29 Sep', '30 Sep', '1 Okt', '2 Okt', '3 Okt', '4 Okt', '5 Okt', '6 Okt', '7 Okt', '8 Okt', '9 Okt', '10 Okt', '11 Okt', '12 Okt', '13 Okt', '14 Okt', '15 Okt', '16 Okt', '17 Okt'],
+    datasets:[
+      {
+        label:"Positif (%)",
+        data:[25, 26, 28, 29, 31, 32, 33, 38, 40, 42, 44, 45, 46, 47, 48, 48.5, 47, 48, 48.5, 49, 49.5, 50],
+        borderColor:"#10b981",
+        backgroundColor:"#a7f3d055",
+        fill:true,
+        tension:0.3,
+        pointRadius:3
+      },
+      {
+        label:"Netral (%)",
+        data:[33, 32, 31, 31, 30, 30, 30, 29, 28, 28, 28, 28, 29, 29, 28.5, 29, 30, 29.5, 29, 28.5, 28, 28],
+        borderColor:"#facc15",
+        backgroundColor:"#fff7cc55",
+        fill:true,
+        tension:0.3,
+        pointRadius:3
+      },
+      {
+        label:"Negatif (%)",
+        data:[42, 42, 41, 40, 39, 38, 37, 33, 32, 30, 28, 27, 26, 26, 23.5, 22.5, 23, 22.5, 22.5, 21.5, 22.5, 22],
+        borderColor:"#ef4444",
+        backgroundColor:"#fca5a555",
+        fill:true,
+        tension:0.3,
+        pointRadius:3
+      }
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{position:"bottom"}},
+    scales:{
+      y:{beginAtZero:true, max:100, title:{display:true,text:"Persentase (%)"}},
+      x:{title:{display:true,text:"Tanggal"}}
+    }
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login — Media Sosial Analytics Portal</title>
+    <!-- Base path -->
+<base href="/online-report/">
+  <link rel="stylesheet" href="" />
+  <style>
+    body { font-family: system-ui, sans-serif; background:#f6f8fa; }
+    main { max-width:420px; margin:auto; padding-top:80px; }
+    .card { background:#fff; border-radius:12px; padding:32px; box-shadow:0 4px 12px rgba(0,0,0,.08); }
+    input, button { width:100%; padding:10px; margin-top:10px; font-size:16px; border-radius:8px; border:1px solid #ccc; }
+    button { background:#0056ff; color:#fff; border:none; cursor:pointer; }
+    button:hover { background:#0042d4; }
+  </style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h2 style="text-align:center;">🔒 Media Sosial Analytics Portal</h2>
+    <p style="text-align:center;">Masukkan kredensial untuk mengakses laporan.</p>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Masuk</button>
+    </form>
+    <p id="msg" style="color:red;text-align:center;margin-top:8px;"></p>
+  </div>
+</main>
+
+<script>
+// ==== Login sederhana dengan hash manual ====
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString(16);
+}
+
+const validUser = "admin";
+const validHash = simpleHash("medsos#2025");
+
+document.getElementById("loginForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const u = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value.trim();
+  const hash = simpleHash(p);
+
+  if (u === validUser && hash === validHash) {
+    localStorage.setItem("loggedIn", "true");
+    // redirect pakai absolute path agar stabil di Netlify
+    window.location.href = "index.html";
+  } else {
+    document.getElementById("msg").textContent = "❌ Username atau password salah";
+  }
+});
+</script>
+</body>
+</html>

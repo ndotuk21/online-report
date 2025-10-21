@@ -1,0 +1,9 @@
+# Redirect semua URL yang tidak cocok ke index.html
+/*    /index.html   200
+
+# Pastikan file statis (CSS, CSV, dll) tetap terbaca
+/assets/*   /assets/:splat   200
+/data-aktivitas.csv   /data-aktivitas.csv   200
+/login.html  /login.html    200
+/laporan_harian.html  /laporan_harian.html  200
+/laporan_analitik.html  /laporan_analitik.html  200

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Media Sosial Analytics Portal</title>
+    <!-- Base path -->
+<base href="/online-report/">
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+
+</style>
+</head>
+<body>
+
+ <!-- ===== Header ===== -->
+<header>
+  <h1>📊 DSB</h1>
+
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+
+  <nav>
+  
+    <a href="index.html" >Home</a>
+    <a href="laporan_harian.html">Laporan Harian</a>
+    <a href="laporan_analitik.html" class="active">Laporan Analitik</a>
+	<a href="lampiran_screenshoot.html">Lampiran (Screen Shoot)</a>
+	<button class="toggle-btn" onclick="logout()">Logout</button>
+	<button class="toggle-btn" onclick="toggleDarkMode()">🌙/☀️</button>
+  </nav>
+
+</header>
+
+  <!-- ===== Main Content ===== -->
+  <main>
+    <div class="title">Analisis Sentimen & Opini Publik</div>
+    <div class="subtitle">Laporan mingguan dan hasil analisis konten media</div>
+
+    <div class="card">
+      <p>
+        Halaman ini menampilkan laporan analitik berdasarkan data media sosial dan pemberitaan daring. 
+        Setiap minggu disajikan dalam format terpisah untuk memudahkan penelusuran perubahan tren dan sentimen publik.
+      </p>
+    </div>
+
+    <div class="card">
+      <b>📆 Pilih Laporan Mingguan</b>
+      <div class="grid">
+        <div class="card">
+          <b>Minggu ke-1 dan 2</b><br>
+          <span>26 Sep – 9 Okt 2025</span><br>
+          <a href="laporan_analitik_mingguke_1.html">Lihat Laporan →</a>
+        </div>
+        <div class="card">
+          <b>Minggu ke-3</b><br>
+          <span>10 – 17 Okt 2025</span><br>
+          <a href="laporan_analitik_mingguke_3.html">Lihat Laporan →</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer>
+    © 2025 Media Sosial Analytics Portal
+  </footer>
+
+  <!-- ===== Script ===== -->
+  <script>
+  function toggleMenu() {
+  document.querySelector('header nav').classList.toggle('show');
+}
+
+    // Redirect ke login jika belum login
+    if (!localStorage.getItem("loggedIn")) {
+      window.location.href = "login.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "login.html";
+    }
+
+    // Efek fade in
+    window.addEventListener("load", () => {
+      document.body.classList.add("loaded");
+    });
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    }
+
+    // Load dark mode state
+    window.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+      }
+    });
+
+    // Transition fade saat berpindah halaman
+    document.querySelectorAll('a').forEach(a => {
+      const href = a.getAttribute('href');
+      if (href && !href.startsWith('#')) {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          document.body.classList.add('fade-out');
+          setTimeout(() => { window.location = href; }, 400);
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
